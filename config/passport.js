@@ -21,8 +21,22 @@ module.exports = function (passport) {
         };
 
         try {
-          let user = await User.findOne({ googleId: profile.id });
-        } catch (error) {}
+          let user = await User.findOneAndUpdate(
+            { googleId: profile.id },
+            newUser,
+            {
+              upsert: true,
+              new: true,
+            }
+          );
+          if (!user) {
+            done(null, false);
+          }
+
+          done(null, user);
+        } catch (error) {
+          console.error(error);
+        }
       }
     )
   );
